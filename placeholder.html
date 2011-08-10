@@ -1,0 +1,262 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Expense Manager</title>
+
+<style>
+body {
+  margin: 0;
+  padding: 0;
+}
+.yui3-highlight {
+  color: #aaf;
+}
+.yui3-reset-button {
+  margin: 10;
+}
+</style>
+
+<link rel="stylesheet" type="text/css"
+href="http://yui.yahooapis.com/3.3.0/build/cssreset/reset-min.css">
+<link rel="stylesheet" type="text/css"
+href="http://yui.yahooapis.com/3.3.0/build/cssfonts/fonts-min.css">
+<link rel="stylesheet" type="text/css"
+href="http://yui.yahooapis.com/3.3.0/build/cssgrids/grids-min.css">
+<link rel="stylesheet" type="text/css"
+href="http://yui.yahooapis.com/3.3.0/build/cssbase/base-min.css">
+<link type="text/css" rel="stylesheet"
+href="http://yui.yahooapis.com/3.3.0/build/cssfonts/fonts-min.css" />
+
+<link rel="stylesheet" type="text/css"
+href="http://prakhar.dyndns.org/yui3.2/examples/node-menunav/assets/node-menunav-examples-base.css">
+
+<script type="text/javascript"
+src="http://yui.yahooapis.com/3.3.0/build/yui/yui-min.js"
+charset="utf-8">
+</script>
+
+<script type="text/javascript">
+  document.documentElement.className = "yui3-loading";
+</script>
+
+</head>
+
+<body class="yui3-skin-sam yui-skin-sam">
+
+<div id="expenseMngr" class="yui3-menu yui3-menu-horizontal yui3-menubuttonnav">
+  <div class="yui3-menu-content">
+    <ul class="first-of-type">
+      <li class="yui3-menuitem">
+        <a class="yui3-menuitem-content"
+        href="http://prakhar.dyndns.org/thrifty/">Expense Manager</a>
+      </li>
+      <li>
+        <a class="yui3-menu-label" href="#find-info"><em>%s</em></a>
+        <div id="find-info" class="yui3-menu">
+          <ul>
+            <li class="yui3-menuitem">
+              <a class="yui3-menuitem-content"
+              href="">Home</a>
+            </li>
+            <li class="yui3-menuitem">
+              <a class="yui3-menuitem-content"
+              href="">Logout</a>
+            </li>
+          </ul>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div id="actions">
+  <ul>
+    <li>
+      <a href="#formContainer">New Expense</a>
+    </li>
+    <li>
+      <a href="#reports">Reports</a>
+    </li>
+  </ul>
+  <div>
+    <div id="formContainer"></div>
+    <div id="reports">
+      <p>see your expense reports</p>
+    </div>
+  </div>
+</div>
+
+<script>
+
+(function() {
+
+YUI({
+  gallery: 'gallery-2011.02.23-19-01'
+}).use('autocomplete', 'autocomplete-highlighters', 'gallery-form',
+  'gallery-aui-calendar-datepicker-select', 'node-menunav', 'tabview',
+  'yui2-calendar', 'yui2-logger', 'io', 'io-base', 'event',
+  'node-base', 'dump',
+
+function(Y) {
+
+String.prototype.trim = function() {
+    return this.replace(/^\s+|\s+$/g,"");
+};
+String.prototype.ltrim = function() {
+    return this.replace(/^\s+/,"");
+};
+String.prototype.rtrim = function() {
+    return this.replace(/\s+$/,"");
+};
+
+function DateField () {
+  DateField.superclass.constructor.apply(this, arguments);
+}
+
+Y.mix(DateField, {
+  NAME : 'date-field'
+});
+var YAHOO = Y.YUI2;
+
+Y.extend(DateField, Y.TextField, {
+  _overlay : null,
+  _calendar : null,
+  renderUI : function () {
+    DateField.superclass.renderUI.apply(this, arguments);
+    var olNode = Y.Node.create('<div></div>'),
+      calNode = Y.Node.create('<div></div>'),
+      calendar,
+      overlay = new Y.Overlay({
+        contentBox : olNode,
+        visible : false,
+        width : '170px',
+        zIndex : 1000,
+        xy : [100, 22]
+      });
+    this.get('contentBox').appendChild(olNode);
+    olNode.appendChild(calNode);
+    overlay.render();
+    this._overlay = overlay;
+    calendar = new YAHOO.widget.Calendar('calendar', olNode.get('id'));
+    calendar.render();
+    this._calendar = calendar;
+  },
+  bindUI : function () {
+    DateField.superclass.bindUI.apply(this, arguments);
+    this._fieldNode.on('focus', Y.bind(function () {
+      this._overlay.show();
+    }, this));
+    this._calendar.selectEvent.subscribe(Y.bind(function(e, oDate) {
+      var oDate = oDate[0][0];
+      this.set('value', oDate[1] + '/' + oDate[2] + '/' + oDate[0]);
+      this._overlay.hide();
+    }, this));
+  }
+});
+
+var myCatFld = new Y.TextField({
+  id: '__myCatFld',
+  name: 'category',
+  label: 'Category'
+});
+
+var myForm = new Y.Form({
+  contentBox : '#formContainer',
+  inlineValidation : true,
+  children: [
+    {name: 'amount', type: 'text', label: 'Amount'},
+    myCatFld,
+    {name: 'description', type: 'text', label: 'Description'},
+    {name: 'dateField', type: DateField, label: 'Date: ',
+        validator: 'date'},
+    {name: 'submit', type: 'SubmitButton', value: 'Submit',
+        id: '__submitExpense'},
+    {name: 'reset', type: 'ResetButton', value: 'Reset'}
+  ]
+});
+
+Y.on('contentready', function() {
+  this.get("ownerDocument").get("documentElement").removeClass(
+      "yui3-loading");
+  this.plug(Y.Plugin.NodeMenuNav);
+}, '#expenseMngr');
+
+var tabView = new Y.TabView({
+  srcNode: '#actions'
+});
+tabView.render();
+myForm.render();
+
+var ac = new Y.AutoComplete({
+  inputNode: '#__myCatFld-field',
+  source: ['drinks', 'movies', 'lunch', 'clothes'],
+  resultHighlighter: 'phraseMatch',
+  render: true
+});
+
+var ioCfg = {
+    method: 'POST',
+    data: ''
+};
+var ioComplete = function (id, o, args) {
+    var id = id,
+        data = o.responseText;
+    ioStatus = o.status.toString().trim();
+    if (ioStatus === '200') {
+        Y.log('Submitted a new expense');
+    } else {
+        Y.log("POST unsuccessful");
+    }
+}
+
+var cntxtObj = {
+    'form': myForm,
+    'ioCfg': ioCfg
+};
+var newExpense = function(e) {
+    var basePath = 'http://prakhar.dyndns.org:8080/',
+        uri = 'newExpense',
+        request = null,
+        _amnt = 0.0,
+        _cat = null,
+        _desc = null,
+        _date = null,
+        normalize = null;
+    normalize = function(s) {
+        if (!s) { return null; }
+        return s !== null ? (s.length < 2 ? '0' + s : s) : null;
+    };
+    f = this['form'];
+    _amnt = f.getField(0).get('value');
+    _cat = f.getField(1).get('value');
+    _desc = f.getField(2).get('value');
+    _date = f.getField(3).get('value').split('/');
+    _date = _date[2] + normalize(_date[0]) + normalize(_date[1]);
+    //request = Y.io(url, ioCfg);
+    Y.log("_amnt = " + _amnt);
+    Y.log("_cat = " + _cat);
+    Y.log("_desc = " + _desc);
+    Y.log("_date = " + _date);
+    this['ioCfg'].data += 'amount=' + _amnt;
+    this['ioCfg'].data += '&category=' + _cat;
+    this['ioCfg'].data += '&description=' + _desc;
+    this['ioCfg'].data += '&date=' + _date;
+    Y.log('context.ioCfg = ' + Y.dump(this['ioCfg']));
+    request = Y.io(basePath + uri, ioCfg);
+}
+
+Y.on('io:complete', ioComplete, Y, {});
+Y.on('click', newExpense, '#__submitExpense', cntxtObj);
+
+});
+
+} () );
+
+</script>
+
+</body>
+
+</html>

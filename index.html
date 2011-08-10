@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Expense Manager</title>
+
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+</style>
+
+<link rel="stylesheet" type="text/css"
+href="http://yui.yahooapis.com/3.3.0/build/cssreset/reset-min.css">
+<link rel="stylesheet" type="text/css"
+href="http://yui.yahooapis.com/3.3.0/build/cssfonts/fonts-min.css">
+<link rel="stylesheet" type="text/css"
+href="http://yui.yahooapis.com/3.3.0/build/cssgrids/grids-min.css">
+<link rel="stylesheet" type="text/css"
+href="http://yui.yahooapis.com/3.3.0/build/cssbase/base-min.css">
+<link type="text/css" rel="stylesheet"
+href="http://yui.yahooapis.com/3.3.0/build/cssfonts/fonts-min.css" />
+
+<script type="text/javascript"
+src="http://yui.yahooapis.com/3.3.0/build/yui/yui-min.js"
+charset="utf-8">
+</script>
+
+</head>
+
+<body class="yui3-skin-sam">
+
+<h1>Your personal expense manager</h1>
+<div id='login'>
+
+<form method="post" action="http://prakhar.dyndns.org:8080/">
+<input type="text" name="email" value="" />
+<button type="submit">Log in using gmail</button>
+<button type="reset">Reset</button>
+</form>
+
+</div>
+
+<script>
+
+/*
+YUI({
+  gallery: 'gallery-2011.02.23-19-01'
+}).use('gallery-form', 'io', 'io-base', 'io-form', 'gallery-form-values'
+  , function(Y) {
+
+var endPoints = {
+  'gmail': 'https://www.google.com/accounts/o8/id'
+  ,'yahoo': 'https://me.yahoo.com'
+};
+
+var myForm = new Y.Form({
+  //action: '/login?q='
+  contentBox : '#login'
+  ,inlineValidation : true
+  ,children: [
+    {name: 'email', type: 'text', label: '<em>Login using gmail</em>\t'}
+    ,{name: 'submit', type: 'SubmitButton', value: 'Submit', id: '__loginButton'}
+    ,{name: 'reset', type: 'ResetButton', value: 'Reset'}
+  ]
+});
+
+myForm.render();
+
+var handleSubmit = function(e) {
+  var e = myForm.getField(0).get('value');
+  var baseUrl = 'http://prakhar.dyndns.org:8080/';
+  var url = baseUrl;
+  alert('email = ' + e + ' url = ' + url);
+  var complete = function(id, o, args) {
+    var id = id;
+    var data = o.responseText;
+  };
+  Y.on('io:complete', complete, Y, []);
+  var ioConfig = {
+      method: 'POST',
+      data: 'email=' + e
+  };
+  var request = Y.io(url, ioConfig);
+};
+Y.on('click', handleSubmit, '#__loginButton');
+
+});
+*/
+
+</script>
+</body>
+
+</html>
